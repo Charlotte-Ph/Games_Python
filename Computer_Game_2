@@ -1,0 +1,51 @@
+python
+import random
+
+def word_guess():
+    # List of words to choose from
+    words = ["apple", "banana", "cherry", "grape", "orange"]
+    
+    # Select a random word from the list
+    word = random.choice(words)
+    
+    # Create a list to store the guessed letters
+    guessed_letters = []
+    
+    # Set the initial number of tries
+    tries = 6
+    
+    print("Welcome to the Word Guessing Game!")
+    print("Try to guess the word.")
+    
+    while tries > 0:
+        # Display the word with blanks for unguessed letters
+        display_word = ""
+        for letter in word:
+            if letter in guessed_letters:
+                display_word += letter
+            else:
+                display_word += "_"
+        print(display_word)
+        
+        # Prompt the user to guess a letter
+        guess = input("Guess a letter: ").lower()
+        
+        if guess in guessed_letters:
+            print("You already guessed that letter. Try again.")
+        elif guess in word:
+            print("Good guess!")
+            guessed_letters.append(guess)
+            
+            # Check if the player has guessed all the letters
+            if set(word) == set(guessed_letters):
+                print(f"Congratulations! You guessed the word '{word}'.")
+                break
+        else:
+            print("Wrong guess!")
+            tries -= 1
+            print(f"You have {tries} tries left.")
+        
+    if tries == 0:
+        print(f"Game over! The word was '{word}'.")
+
+word_guess()
