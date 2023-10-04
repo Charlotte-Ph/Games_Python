@@ -26,4 +26,4 @@ def guess_number():
             print("Good job! You guessed the number in {guesses_taken} tries.")
             break
 
-guess_numbmer()
+guess_number()
