@@ -1,0 +1,29 @@
+python
+import random
+
+def guess_number():
+    # Generate a random number between 1 and 100
+    number = random.randint(1, 100)
+    
+    # Set the initial number of guesses
+    guesses_taken = 0
+    
+    print("Welcome to the Guessing Game!")
+    print("I'm thinking of a number between 1 and 100.")
+    
+    while True:
+        # Prompt the user to make a guess
+        guess = int(input("Take a guess: "))
+        
+        # Increment the number of guesses
+        guesses_taken += 1
+        
+        if guess < number:
+            print("Too low!")
+        elif guess > number:
+            print("Too high!")
+        else:
+            print("Good job! You guessed the number in {guesses_taken} tries.")
+            break
+
+guess_numbmer()
