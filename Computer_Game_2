@@ -1,4 +1,4 @@
-python
+# python
 import random
 
 def word_guess():
@@ -38,14 +38,14 @@ def word_guess():
             
             # Check if the player has guessed all the letters
             if set(word) == set(guessed_letters):
-                print(f"Congratulations! You guessed the word '{word}'.")
+                print("Congratulations! You guessed the word '{word}'.")
                 break
         else:
             print("Wrong guess!")
             tries -= 1
-            print(f"You have {tries} tries left.")
+            print("You have {tries} tries left.")
         
     if tries == 0:
-        print(f"Game over! The word was '{word}'.")
+        print("Game over! The word was '{word}'.")
 
 word_guess()
