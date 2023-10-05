@@ -1,0 +1,81 @@
+python
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Set up the game window
+window_width = 800
+window_height = 600
+window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Halloween Game")
+
+# Load game assets
+background_image = pygame.image.load("background.png")
+player_image = pygame.image.load("player.png")
+candy_image = pygame.image.load("candy.png")
+
+# Player properties
+player_width = 64
+player_height = 64
+player_x = window_width // 2 - player_width // 2
+player_y = window_height - player_height
+player_speed = 5
+
+# Candy properties
+candy_width = 32
+candy_height = 32
+candy_x = random.randint(0, window_width - candy_width)
+candy_y = -candy_height
+candy_speed = 3
+
+score = 0
+font = pygame.font.Font(None, 36)
+
+# Game loop
+running = True
+clock = pygame.time.Clock()
+
+while running:
+    clock.tick(60)  # Limit the frame rate to 60 FPS
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Player movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= player_speed
+    if keys[pygame.K_RIGHT] and player_x < window_width - player_width:
+        player_x += player_speed
+
+    # Update candy position
+    candy_y += candy_speed
+
+    # Check for collision
+    if player_x < candy_x + candy_width and \
+            player_x + player_width > candy_x and \
+            player_y < candy_y + candy_height and \
+            player_y + player_height > candy_y:
+        score += 1
+        candy_x = random.randint(0, window_width - candy_width)
+        candy_y = -candy_height
+
+    # Check if candy is missed
+    if candy_y > window_height:
+        candy_x = random.randint(0, window_width - candy_width)
+        candy_y = -candy_height
+
+    # Draw game elements
+    window.blit(background_image, (0, 0))
+    window.blit(player_image, (player_x, player_y))
+    window.blit(candy_image, (candy_x, candy_y))
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    window.blit(score_text, (10, 10))
+
+    pygame.display.flip()
+
+# Quit the game
+pygame.quit()
