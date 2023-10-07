@@ -1,4 +1,4 @@
-python
+# python
 import pygame
 import random
 
@@ -16,6 +16,11 @@ background_image = pygame.image.load("background.png")
 player_image = pygame.image.load("player.png")
 candy_image = pygame.image.load("candy.png")
 
+# Load sound effects
+collect_sound = pygame.mixer.Sound("collect.wav")
+miss_sound = pygame.mixer.Sound("miss.wav")
+game_over_sound = pygame.mixer.Sound("game_over.wav")
+
 # Player properties
 player_width = 64
 player_height = 64
@@ -30,8 +35,25 @@ candy_x = random.randint(0, window_width - candy_width)
 candy_y = -candy_height
 candy_speed = 3
 
+# Power-up properties
+power_up_width = 32
+power_up_height = 32
+power_up_x = random.randint(0, window_width - power_up_width)
+power_up_y = -power_up_height
+power_up_speed = 3
+power_up_active = False
+power_up_timer = 0
+
 score = 0
 font = pygame.font.Font(None, 36)
+game_over_font = pygame.font.Font(None, 72)
+
+# Game state variables
+game_over = False
+lives = 3
+level = 1
+time_limit = 60
+timer = time_limit * 1000  # convert to milliseconds
 
 # Game loop
 running = True
@@ -43,30 +65,90 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                # Pause the game
+                pygame.mixer.pause()
+                pygame.time.delay(500)  # Delay to prevent accidental input
+                paused = True
+                while paused:
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_p:
+                                # Resume the game
+                                paused = False
+                                pygame.mixer.unpause()
 
-    # Player movement
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_speed
-    if keys[pygame.K_RIGHT] and player_x < window_width - player_width:
-        player_x += player_speed
+    if not game_over:
+        # Player movement
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and player_x > 0:
+            player_x -= player_speed
+        if keys[pygame.K_RIGHT] and player_x < window_width - player_width:
+            player_x += player_speed
 
-    # Update candy position
-    candy_y += candy_speed
+        # Update candy position
+        candy_y += candy_speed
 
-    # Check for collision
-    if player_x < candy_x + candy_width and \
-            player_x + player_width > candy_x and \
-            player_y < candy_y + candy_height and \
-            player_y + player_height > candy_y:
-        score += 1
-        candy_x = random.randint(0, window_width - candy_width)
-        candy_y = -candy_height
+        # Update power-up position
+        power_up_y += power_up_speed
 
-    # Check if candy is missed
-    if candy_y > window_height:
-        candy_x = random.randint(0, window_width - candy_width)
-        candy_y = -candy_height
+        # Check for collision with candy
+        if player_x < candy_x + candy_width and \
+                player_x + player_width > candy_x and \
+                player_y < candy_y + candy_height and \
+                player_y + player_height > candy_y:
+            score += 1
+            candy_x = random.randint(0, window_width - candy_width)
+            candy_y = -candy_height
+            collect_sound.play()
+
+        # Check for collision with power-up
+        if power_up_active and player_x < power_up_x + power_up_width and \
+                player_x + player_width > power_up_x and \
+                player_y < power_up_y + power_up_height and \
+                player_y + player_height > power_up_y:
+            power_up_active = False
+            power_up_timer = 0
+            player_speed += 2
+            collect_sound.play()
+
+        # Check if candy is missed
+        if candy_y > window_height:
+            candy_x = random.randint(0, window_width - candy_width)
+            candy_y = -candy_height
+            lives -= 1
+            miss_sound.play()
+            if lives == 0:
+                game_over = True
+                game_over_sound.play()
+
+        # Check if power-up is missed
+        if power_up_y > window_height:
+            power_up_x = random.randint(0, window_width - power_up_width)
+            power_up_y = -power_up_height
+            power_up_active = False
+            power_up_timer = 0
+
+        # Check if power-up timer has expired
+        if power_up_active:
+            power_up_timer += clock.get_time()
+            if power_up_timer >= 5000:
+                power_up_active = False
+                power_up_timer = 0
+                player_speed -= 2
+
+        # Check if time is up
+        timer -= clock.get_time()
+        if timer <= 0:
+            level += 1
+            candy_speed += 1
+            power_up_speed += 1
+            candy_x = random.randint(0, window_width - candy_width)
+            candy_y = -candy_height
+            power_up_x = random.randint(0, window_width - power_up_width)
+            power_up_y = -power_up_height
+            timer = time_limit * 1000
 
     # Draw game elements
     window.blit(background_image, (0, 0))
@@ -74,6 +156,17 @@ while running:
     window.blit(candy_image, (candy_x, candy_y))
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     window.blit(score_text, (10, 10))
+    lives_text = font.render("Lives: " + str(lives), True, (255, 255, 255))
+    window.blit(lives_text, (10, 50))
+    level_text = font.render("Level: " + str(level), True, (255, 255, 255))
+    window.blit(level_text, (10, 90))
+    timer_text = font.render("Time: " + str(timer // 1000), True, (255, 255, 255))
+    window.blit(timer_text, (10, 130))
+
+    if game_over:
+        game_over_text = game_over_font.render("Game Over", True, (255, 255, 255))
+        window.blit(game_over_text, (window_width // 2 - game_over_text.get_width() // 2,
+                                      window_height // 2 - game_over_text.get_height() // 2))
 
     pygame.display.flip()
 
