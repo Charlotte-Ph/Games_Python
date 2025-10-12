@@ -1,19 +1,22 @@
 import random
-import random
 
+# List of words for the game
 words = ["python", "java", "javascript", "hangman", "developer", "algorithm", "computer", "function", "loop", "variable"]
 
+# Function to choose a word based on the difficulty level
 def choose_word(difficulty):
     if difficulty == 'easy':
-        return random.choice([word for word in words if len(word) <= 5])
+        return random.choice([word for word in words if len(word) <= 5])  # Easy words have 5 or fewer letters
     elif difficulty == 'medium':
-        return random.choice([word for word in words if 5 < len(word) <= 8])
+        return random.choice([word for word in words if 5 < len(word) <= 8])  # Medium words have 6 to 8 letters
     else:
-        return random.choice([word for word in words if len(word) > 8])
+        return random.choice([word for word in words if len(word) > 8])  # Hard words have more than 8 letters
 
+# Function to display the word with underscores for unguessed letters
 def display_word(word, guessed_letters):
     return " ".join([letter if letter in guessed_letters else "_" for letter in word])
 
+# Function to display the hangman graphic based on the number of wrong attempts
 def display_hangman(attempts):
     stages = [
         '''
@@ -80,51 +83,57 @@ def display_hangman(attempts):
         -----------
         '''
     ]
-    return stages[6 - attempts]
+    return stages[6 - attempts]  # Return the corresponding hangman stage based on remaining attempts
 
+# Main function to run the Hangman game
 def hangman():
     print("Welcome to Hangman!")
-    difficulty = input("Choose difficulty (easy, medium, hard): ").lower()
-    word = choose_word(difficulty)
-    guessed_letters = []
-    attempts = 6
-    correct_guesses = 0
-    word_length = len(word)
-    guessed_word = display_word(word, guessed_letters)
+    difficulty = input("Choose difficulty (easy, medium, hard): ").lower()  # Ask user for difficulty level
+    word = choose_word(difficulty)  # Select a word based on the chosen difficulty
+    guessed_letters = []  # List to store the guessed letters
+    attempts = 6  # Maximum number of wrong attempts
+    correct_guesses = 0  # Number of correct guesses
+    word_length = len(word)  # Length of the word to be guessed
+    guessed_word = display_word(word, guessed_letters)  # Display the word with underscores for unguessed letters
 
+    # Game loop, runs until attempts are exhausted or the word is guessed
     while attempts > 0 and correct_guesses < word_length:
         print("\nWord: ", guessed_word)
         print(f"Attempts remaining: {attempts}")
-        print(display_hangman(attempts))
+        print(display_hangman(attempts))  # Display the current hangman graphic
         
-        guess = input("Guess a letter: ").lower()
+        guess = input("Guess a letter: ").lower()  # Get a letter guess from the player
 
+        # Validate the input
         if len(guess) != 1 or not guess.isalpha():
-            print("Please enter a single valid letter.")
+            print("Please enter a single valid letter.")  # Prompt the user if input is invalid
             continue
 
         if guess in guessed_letters:
-            print(f"You've already guessed '{guess}'. Try another letter.")
+            print(f"You've already guessed '{guess}'. Try another letter.")  # Inform the user if the letter has already been guessed
             continue
 
-        guessed_letters.append(guess)
+        guessed_letters.append(guess)  # Add the guessed letter to the list of guessed letters
 
         if guess in word:
-            correct_guesses += word.count(guess)
+            correct_guesses += word.count(guess)  # Count how many times the guessed letter is in the word
             print(f"Good job! '{guess}' is in the word.")
         else:
-            attempts -= 1
+            attempts -= 1  # Decrease the number of remaining attempts
             print(f"Sorry, '{guess}' is not in the word.")
 
-        guessed_word = display_word(word, guessed_letters)
+        guessed_word = display_word(word, guessed_letters)  # Update the display with the latest guesses
 
+    # Check the result of the game
     if correct_guesses == word_length:
         print("\nCongratulations! You guessed the word:", word)
     else:
         print(f"\nGame Over! The word was: {word}")
 
+    # Ask the user if they want to play again
     play_again = input("Do you want to play again? (yes/no): ").lower()
     if play_again == 'yes':
-        hangman()
+        hangman()  # Start a new game if the player chooses to play again
 
+# Start the game
 hangman()
