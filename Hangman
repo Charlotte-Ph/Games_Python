@@ -1,30 +1,101 @@
 import random
+import random
 
-# List of words for the game
 words = ["python", "java", "javascript", "hangman", "developer", "algorithm", "computer", "function", "loop", "variable"]
 
-def choose_word():
-    """Randomly choose a word from the list"""
-    return random.choice(words)
+def choose_word(difficulty):
+    if difficulty == 'easy':
+        return random.choice([word for word in words if len(word) <= 5])
+    elif difficulty == 'medium':
+        return random.choice([word for word in words if 5 < len(word) <= 8])
+    else:
+        return random.choice([word for word in words if len(word) > 8])
 
 def display_word(word, guessed_letters):
-    """Display the word with underscores for unguessed letters"""
     return " ".join([letter if letter in guessed_letters else "_" for letter in word])
 
-def hangman():
-    """Main function to run the Hangman game"""
-    word = choose_word()  # Choose a random word from the list
-    guessed_letters = []  # Store guessed letters
-    attempts = 6  # Number of allowed incorrect guesses
-    correct_guesses = 0  # Number of correctly guessed letters
-    word_length = len(word)  # Length of the word
+def display_hangman(attempts):
+    stages = [
+        '''
+           ------
+           |    |
+                |
+                |
+                |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+                |
+                |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+           |    |
+                |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+          /|    |
+                |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+          /|\\   |
+                |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+          /|\\   |
+          /     |
+                |
+        -----------
+        ''',
+        '''
+           ------
+           |    |
+           O    |
+          /|\\   |
+          / \\   |
+                |
+        -----------
+        '''
+    ]
+    return stages[6 - attempts]
 
+def hangman():
     print("Welcome to Hangman!")
-    print("Try to guess the word.")
-    
+    difficulty = input("Choose difficulty (easy, medium, hard): ").lower()
+    word = choose_word(difficulty)
+    guessed_letters = []
+    attempts = 6
+    correct_guesses = 0
+    word_length = len(word)
+    guessed_word = display_word(word, guessed_letters)
+
     while attempts > 0 and correct_guesses < word_length:
-        print("\nWord: ", display_word(word, guessed_letters))
+        print("\nWord: ", guessed_word)
         print(f"Attempts remaining: {attempts}")
+        print(display_hangman(attempts))
         
         guess = input("Guess a letter: ").lower()
 
@@ -39,16 +110,21 @@ def hangman():
         guessed_letters.append(guess)
 
         if guess in word:
-            correct_guesses += word.count(guess)  # Count how many times the guessed letter is in the word
+            correct_guesses += word.count(guess)
             print(f"Good job! '{guess}' is in the word.")
         else:
             attempts -= 1
             print(f"Sorry, '{guess}' is not in the word.")
+
+        guessed_word = display_word(word, guessed_letters)
 
     if correct_guesses == word_length:
         print("\nCongratulations! You guessed the word:", word)
     else:
         print(f"\nGame Over! The word was: {word}")
 
-# Start the game
+    play_again = input("Do you want to play again? (yes/no): ").lower()
+    if play_again == 'yes':
+        hangman()
+
 hangman()
