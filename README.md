@@ -7,3 +7,6 @@ You can also contribute by creating a local environment. For more information, s
 For more complex contributions, please open an issue using the most appropriate issue template to describe the changes you'd like to see.
 
 Thank you!!
+
+# Hacktoberfest
+P.S. I participate in Hacktoberfest every year since 2023!
