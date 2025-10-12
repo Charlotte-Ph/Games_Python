@@ -1,4 +1,3 @@
-python
 import random
 
 def guess_number():
@@ -12,18 +11,30 @@ def guess_number():
     print("I'm thinking of a number between 1 and 100.")
     
     while True:
-        # Prompt the user to make a guess
-        guess = int(input("Take a guess: "))
+        # Prompt the user to make a guess with input validation
+        try:
+            guess = int(input("Take a guess: "))
+        except ValueError:
+            print("Please enter a valid number.")
+            continue
         
         # Increment the number of guesses
         guesses_taken += 1
         
+        # Provide feedback on the guess
         if guess < number:
             print("Too low!")
         elif guess > number:
             print("Too high!")
         else:
-            print("Good job! You guessed the number in {guesses_taken} tries.")
+            print(f"Good job! You guessed the number in {guesses_taken} tries.")
             break
+
+    # Ask the user if they want to play again
+    play_again = input("Do you want to play again? (yes/no): ").lower()
+    if play_again == "yes":
+        guess_number()  # Restart the game if they want to play again
+    else:
+        print("Thanks for playing!")
 
 guess_number()
